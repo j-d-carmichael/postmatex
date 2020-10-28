@@ -299,7 +299,11 @@ class Postmate {
       this.parent.addEventListener('message', reply, false)
 
       const doSend = () => {
-        attempt++
+        if (++attempt > maxHandshakeRequests) {
+          clearInterval(responseInterval)
+          return reject('Handshake Timeout Reached')
+        }
+
         log(`Parent: Sending handshake attempt ${attempt}`, { childOrigin })
 
         this.child.postMessage({
@@ -307,10 +311,6 @@ class Postmate {
           type: messageType,
           model: this.model,
         }, childOrigin)
-
-        if (attempt === maxHandshakeRequests) {
-          clearInterval(responseInterval)
-        }
       }
 
       const loaded = () => {
