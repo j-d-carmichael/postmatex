@@ -1,14 +1,14 @@
 /**
   postmate - A powerful, simple, promise-based postMessage library
   @version v1.6.0
-  @link https://github.com/dollarshaveclub/postmate
+  @link https://github.com/johndcarmichael/postmate2
   @author Jacob Kelley <jakie8@gmail.com>
   @license MIT
 **/
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global = global || self, global.Postmate = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Postmate = factory());
 }(this, (function () { 'use strict';
 
   /**
@@ -280,7 +280,12 @@
       this.parent = window;
       this.frame = document.createElement('iframe');
       this.frame.name = name || '';
-      this.frame.classList.add.apply(this.frame.classList, classListArray);
+
+      if (classListArray.length > 0) {
+        // check for IE 11. See issue#207
+        this.frame.classList.add.apply(this.frame.classList, classListArray);
+      }
+
       container.appendChild(this.frame);
       this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow;
       this.model = model || {};
@@ -325,7 +330,11 @@
         _this4.parent.addEventListener('message', reply, false);
 
         var doSend = function doSend() {
-          attempt++;
+          if (++attempt > maxHandshakeRequests) {
+            clearInterval(responseInterval);
+            return reject('Handshake Timeout Reached');
+          }
+
           log("Parent: Sending handshake attempt " + attempt, {
             childOrigin: childOrigin
           });
@@ -335,10 +344,6 @@
             type: messageType,
             model: _this4.model
           }, childOrigin);
-
-          if (attempt === maxHandshakeRequests) {
-            clearInterval(responseInterval);
-          }
         };
 
         var loaded = function loaded() {

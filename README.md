@@ -2,6 +2,13 @@
   <img src="https://dollarshaveclub.github.io/postmate/assets/postmate-v3.svg">
 </a>
 
+
+
+## This is under temporary new "management" as the previous owners cannot be found.
+## Looking for any help to maintain this codebase.
+## Or better yet for the original authors to take it back.
+
+
 > A powerful, simple, promise-based `postMessage` iFrame communication library.
 
 [![npm][npm-image]][npm-url]
