@@ -1,5 +1,4 @@
-assets
-node_modules
-bower_components
-test
-tests
+.idea/
+.git
+.git*
+.git/*

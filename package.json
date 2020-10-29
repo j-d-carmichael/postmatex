@@ -1,7 +1,19 @@
 {
   "name": "postmatex",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "Fork of original: A powerful, simple, promise-based postMessage library",
+  "scripts": {
+    "eslint": "eslint . --fix",
+    "eslint:ci": "eslint .",
+    "test": "npm run test:unit && npm run test:acceptance && npm run test:es-check",
+    "test:es-check": "es-check es5 build/postmate.min.js",
+    "test:unit": "jest --coverage",
+    "test:acceptance": "gulp test",
+    "build": "npm run build:dist && npm run build:readme",
+    "build:readme": "node ./scripts/update-readme.js",
+    "build:dist": "rollup --config configs/rollup.config.js",
+    "postpublish": "git tag $npm_package_version && git push origin --tags"
+  },
   "main": "build/postmate.js",
   "module": "build/postmate.es.js",
   "unpkg": "build/postmate.min.js",
@@ -42,18 +54,6 @@
     "uglify-js": "^3.11.4",
     "vinyl-source-stream": "^2.0.0"
   },
-  "scripts": {
-    "eslint": "eslint . --fix",
-    "eslint:ci": "eslint .",
-    "test": "npm run test:unit && npm run test:acceptance && npm run test:es-check",
-    "test:es-check": "es-check es5 build/postmate.min.js",
-    "test:unit": "jest --coverage",
-    "test:acceptance": "gulp test",
-    "build": "npm run build:dist && npm run build:readme",
-    "build:readme": "node ./scripts/update-readme.js",
-    "build:dist": "rollup --config configs/rollup.config.js",
-    "postpublish": "git tag $npm_package_version && git push origin --tags"
-  },
   "jest": {
     "testRegex": "./test/unit/.*.js$",
     "testURL": "http://localhost/"
@@ -80,8 +80,5 @@
   "browserslist": [
     "defaults",
     "ie >= 11"
-  ],
-  "dependencies": {
-    "penpal": "^5.3.0"
-  }
+  ]
 }
