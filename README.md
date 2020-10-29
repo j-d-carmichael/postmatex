@@ -7,6 +7,7 @@
 - The original package; https://www.npmjs.com/package/postmate
 - The original package has not seen any movement regarding new issues and merge requests in around 9 months but is (imo) the lightest and simplest to work with.
 - This package is being updated with any PRs from the original postmate and directly onto this repo.
+- Dependencies are updated
 
 (Would welcome the original authors to assume back "command")
 

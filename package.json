@@ -1,7 +1,7 @@
 {
   "name": "postmatex",
-  "version": "1.7.0",
-  "description": "A powerful, simple, promise-based postMessage library",
+  "version": "1.7.1",
+  "description": "Fork of original: A powerful, simple, promise-based postMessage library",
   "main": "build/postmate.js",
   "module": "build/postmate.es.js",
   "unpkg": "build/postmate.min.js",
@@ -60,7 +60,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/johndcarmichael/postmate2.git"
+    "url": "git+https://github.com/johndcarmichael/postmatex.git"
   },
   "keywords": [
     "postMessage",
@@ -74,9 +74,9 @@
   "author": "Jacob Kelley <jakie8@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/johndcarmichael/postmate2/issues"
+    "url": "https://github.com/johndcarmichael/postmatex/issues"
   },
-  "homepage": "https://github.com/johndcarmichael/postmate2",
+  "homepage": "https://github.com/johndcarmichael/postmatex",
   "browserslist": [
     "defaults",
     "ie >= 11"
