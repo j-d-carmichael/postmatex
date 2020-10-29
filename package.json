@@ -1,5 +1,5 @@
 {
-  "name": "postmat2",
+  "name": "postmatex",
   "version": "1.7.0",
   "description": "A powerful, simple, promise-based postMessage library",
   "main": "build/postmate.js",
@@ -80,5 +80,8 @@
   "browserslist": [
     "defaults",
     "ie >= 11"
-  ]
+  ],
+  "dependencies": {
+    "penpal": "^5.3.0"
+  }
 }

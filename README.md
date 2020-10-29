@@ -3,11 +3,15 @@
 </a>
 
 
+## This is fork
+- The original package; https://www.npmjs.com/package/postmate
+- The original package has not seen any movement regarding new issues and merge requests in around 9 months but is (imo) the lightest and simplest to work with.
+- This package is being updated with any PRs from the original postmate and directly onto this repo.
 
-## This is under temporary new "management" as the previous owners cannot be found.
+(Would welcome the original authors to assume back "command")
+
 ## Looking for any help to maintain this codebase.
 ## Or better yet for the original authors to take it back.
-
 
 > A powerful, simple, promise-based `postMessage` iFrame communication library.
 
@@ -73,6 +77,8 @@ $ npm i postmate --save # Install via NPM
 
 **parent.com**
 ```javascript
+import Postmate from 'postmatex'
+
 // Kick off the handshake with the iFrame
 const handshake = new Postmate({
   container: document.getElementById('some-div'), // Element to inject frame into
