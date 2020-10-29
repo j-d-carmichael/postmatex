@@ -1,6 +1,0 @@
-{
-  "extends": "dollarshaveclub",
-  "rules": {
-    "import/no-duplicates": 0,
-  }
-}
