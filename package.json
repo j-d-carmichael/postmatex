@@ -1,6 +1,6 @@
 {
   "name": "postmatex",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "Fork of original: A powerful, simple, promise-based postMessage library",
   "scripts": {
     "eslint": "eslint . --fix",
@@ -14,6 +14,7 @@
     "build:dist": "rollup --config configs/rollup.config.js",
     "postpublish": "git tag $npm_package_version && git push origin --tags"
   },
+  "types": "build/index.d.ts",
   "main": "build/postmate.js",
   "module": "build/postmate.es.js",
   "unpkg": "build/postmate.min.js",
