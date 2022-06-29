@@ -2,31 +2,31 @@
  * The type of messages our frames our sending
  * @type {String}
  */
-export const messageType = 'application/x-postmate-v1+json'
+export const messageType = 'application/x-postmate-v1+json';
 
 /**
  * The maximum number of attempts to send a handshake request to the parent
  * @type {Number}
  */
-export const maxHandshakeRequests = 5
+export const maxHandshakeRequests = 5;
 
 /**
  * A unique message ID that is used to ensure responses are sent to the correct requests
  * @type {Number}
  */
-let _messageId = 0
+let _messageId = 0;
 
 /**
  * Increments and returns a message ID
  * @return {Number} A unique ID for a message
  */
-export const generateNewMessageId = () => ++_messageId
+export const generateNewMessageId = () => ++_messageId;
 
 /**
  * Postmate logging function that enables/disables via config
  * @param  {Object} ...args Rest Arguments
  */
-export const log = (...args) => Postmate.debug ? console.log(...args) : null // eslint-disable-line no-console
+export const log = (...args) => Postmate.debug ? console.log(...args) : null; // eslint-disable-line no-console
 
 /**
  * Takes a URL and returns the origin
@@ -34,12 +34,12 @@ export const log = (...args) => Postmate.debug ? console.log(...args) : null // 
  * @return {String}     The URLs origin
  */
 export const resolveOrigin = (url) => {
-  const a = document.createElement('a')
-  a.href = url
-  const protocol = a.protocol.length > 4 ? a.protocol : window.location.protocol
-  const host = a.host.length ? ((a.port === '80' || a.port === '443') ? a.hostname : a.host) : window.location.host
-  return a.origin || `${protocol}//${host}`
-}
+  const a = document.createElement('a');
+  a.href = url;
+  const protocol = a.protocol.length > 4 ? a.protocol : window.location.protocol;
+  const host = a.host.length ? ((a.port === '80' || a.port === '443') ? a.hostname : a.host) : window.location.host;
+  return a.origin || `${protocol}//${host}`;
+};
 
 const messageTypes = {
   handshake: 1,
@@ -48,7 +48,7 @@ const messageTypes = {
   emit: 1,
   reply: 1,
   request: 1,
-}
+};
 
 /**
  * Ensures that a message is safe to interpret
@@ -60,16 +60,16 @@ export const sanitize = (message, allowedOrigin) => {
   if (
     typeof allowedOrigin === 'string' &&
     message.origin !== allowedOrigin
-  ) return false
-  if (!message.data) return false
+  ) return false;
+  if (!message.data) return false;
   if (
     typeof message.data === 'object' &&
     !('postmate' in message.data)
-  ) return false
-  if (message.data.type !== messageType) return false
-  if (!messageTypes[message.data.postmate]) return false
-  return true
-}
+  ) return false;
+  if (message.data.type !== messageType) return false;
+  if (!messageTypes[message.data.postmate]) return false;
+  return true;
+};
 
 /**
  * Takes a model, and searches for a value by the property
@@ -81,9 +81,9 @@ export const sanitize = (message, allowedOrigin) => {
  */
 export const resolveValue = (model, property) => {
   const unwrappedContext = typeof model[property] === 'function'
-    ? model[property]() : model[property]
-  return Postmate.Promise.resolve(unwrappedContext)
-}
+    ? model[property]() : model[property];
+  return Postmate.Promise.resolve(unwrappedContext);
+};
 
 /**
  * Composes an API to be used by the parent
@@ -91,52 +91,52 @@ export const resolveValue = (model, property) => {
  */
 export class ParentAPI {
   constructor (info) {
-    this.parent = info.parent
-    this.frame = info.frame
-    this.child = info.child
-    this.childOrigin = info.childOrigin
+    this.parent = info.parent;
+    this.frame = info.frame;
+    this.child = info.child;
+    this.childOrigin = info.childOrigin;
 
-    this.events = {}
+    this.events = {};
 
-    log('Parent: Registering API')
-    log('Parent: Awaiting messages...')
+    log('Parent: Registering API');
+    log('Parent: Awaiting messages...');
 
     this.listener = (e) => {
-      if (!sanitize(e, this.childOrigin)) return false
+      if (!sanitize(e, this.childOrigin)) return false;
 
       /**
        * the assignments below ensures that e, data, and value are all defined
        */
-      const { data, name } = (((e || {}).data || {}).value || {})
+      const { data, name } = (((e || {}).data || {}).value || {});
 
       if (e.data.postmate === 'emit') {
-        log(`Parent: Received event emission: ${name}`)
+        log(`Parent: Received event emission: ${name}`);
 
         if (name in this.events) {
           this.events[name].forEach(callback => {
-            callback.call(this, data)
-          })
+            callback.call(this, data);
+          });
         }
       }
-    }
+    };
 
-    this.parent.addEventListener('message', this.listener, false)
-    log('Parent: Awaiting event emissions from Child')
+    this.parent.addEventListener('message', this.listener, false);
+    log('Parent: Awaiting event emissions from Child');
   }
 
   get (property) {
     return new Postmate.Promise((resolve) => {
       // Extract data from response and kill listeners
-      const uid = generateNewMessageId()
+      const uid = generateNewMessageId();
       const transact = (e) => {
         if (e.data.uid === uid && e.data.postmate === 'reply') {
-          this.parent.removeEventListener('message', transact, false)
-          resolve(e.data.value)
+          this.parent.removeEventListener('message', transact, false);
+          resolve(e.data.value);
         }
-      }
+      };
 
       // Prepare for response from Child...
-      this.parent.addEventListener('message', transact, false)
+      this.parent.addEventListener('message', transact, false);
 
       // Then ask child for information
       this.child.postMessage({
@@ -144,8 +144,8 @@ export class ParentAPI {
         type: messageType,
         property,
         uid,
-      }, this.childOrigin)
-    })
+      }, this.childOrigin);
+    });
   }
 
   call (property, data) {
@@ -155,20 +155,20 @@ export class ParentAPI {
       type: messageType,
       property,
       data,
-    }, this.childOrigin)
+    }, this.childOrigin);
   }
 
   on (eventName, callback) {
     if (!this.events[eventName]) {
-      this.events[eventName] = []
+      this.events[eventName] = [];
     }
-    this.events[eventName].push(callback)
+    this.events[eventName].push(callback);
   }
 
   destroy () {
-    log('Parent: Destroying Postmate instance')
-    window.removeEventListener('message', this.listener, false)
-    this.frame.parentNode.removeChild(this.frame)
+    log('Parent: Destroying Postmate instance');
+    window.removeEventListener('message', this.listener, false);
+    this.frame.parentNode.removeChild(this.frame);
   }
 }
 
@@ -178,26 +178,26 @@ export class ParentAPI {
  */
 export class ChildAPI {
   constructor (info) {
-    this.model = info.model
-    this.parent = info.parent
-    this.parentOrigin = info.parentOrigin
-    this.child = info.child
+    this.model = info.model;
+    this.parent = info.parent;
+    this.parentOrigin = info.parentOrigin;
+    this.child = info.child;
 
-    log('Child: Registering API')
-    log('Child: Awaiting messages...')
+    log('Child: Registering API');
+    log('Child: Awaiting messages...');
 
     this.child.addEventListener('message', (e) => {
-      if (!sanitize(e, this.parentOrigin)) return
+      if (!sanitize(e, this.parentOrigin)) return;
 
-      log('Child: Received request', e.data)
+      log('Child: Received request', e.data);
 
-      const { property, uid, data } = e.data
+      const { property, uid, data } = e.data;
 
       if (e.data.postmate === 'call') {
         if (property in this.model && typeof this.model[property] === 'function') {
-          this.model[property](data)
+          this.model[property](data);
         }
-        return
+        return;
       }
 
       // Reply to Parent
@@ -208,13 +208,13 @@ export class ChildAPI {
           type: messageType,
           uid,
           value,
-        }, e.origin))
-    })
+        }, e.origin));
+    });
   }
 
   emit (name, data) {
 
-    log(`Child: Emitting Event "${name}"`, data)
+    log(`Child: Emitting Event "${name}"`, data);
 
     this.parent.postMessage({
       postmate: 'emit',
@@ -223,7 +223,7 @@ export class ChildAPI {
         name,
         data,
       },
-    }, this.parentOrigin)
+    }, this.parentOrigin);
   }
 }
 
@@ -232,16 +232,16 @@ export class ChildAPI {
  * @type {Class}
  */
 class Postmate {
-  static debug = false // eslint-disable-line no-undef
+  static debug = false; // eslint-disable-line no-undef
 
   // Internet Explorer craps itself
   static Promise = (() => {
     try {
-      return window ? window.Promise : Promise
+      return window ? window.Promise : Promise;
     } catch (e) {
-      return null
+      return null;
     }
-  })()
+  })();
 
   /**
    * Sets options related to the Parent
@@ -254,18 +254,24 @@ class Postmate {
     url,
     name,
     classListArray = [],
+    attributes = []
   }) { // eslint-disable-line no-undef
-    this.parent = window
-    this.frame = document.createElement('iframe')
-    this.frame.name = name || ''
-    if (classListArray.length > 0) { // check for IE 11. See issue#207
-      this.frame.classList.add.apply(this.frame.classList, classListArray)
-    }
-    container.appendChild(this.frame)
-    this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow
-    this.model = model || {}
+    this.parent = window;
+    this.frame = document.createElement('iframe');
+    this.frame.name = name || '';
 
-    return this.sendHandshake(url)
+    attributes.forEach((datum) => {
+      this.frame.setAttribute(datum.name, datum.value);
+    });
+
+    if (classListArray.length > 0) { // check for IE 11. See issue#207
+      this.frame.classList.add.apply(this.frame.classList, classListArray);
+    }
+    container.appendChild(this.frame);
+    this.child = this.frame.contentWindow || this.frame.contentDocument.parentWindow;
+    this.model = model || {};
+
+    return this.sendHandshake(url);
   }
 
   /**
@@ -274,62 +280,62 @@ class Postmate {
    * @return {Promise}     Promise that resolves when the handshake is complete
    */
   sendHandshake (url) {
-    const childOrigin = resolveOrigin(url)
-    let attempt = 0
-    let responseInterval
+    const childOrigin = resolveOrigin(url);
+    let attempt = 0;
+    let responseInterval;
     return new Postmate.Promise((resolve, reject) => {
       const reply = (e) => {
-        if (!sanitize(e, childOrigin)) return false
+        if (!sanitize(e, childOrigin)) return false;
         if (e.data.postmate === 'handshake-reply') {
-          clearInterval(responseInterval)
+          clearInterval(responseInterval);
 
-          log('Parent: Received handshake reply from Child')
-          this.parent.removeEventListener('message', reply, false)
-          this.childOrigin = e.origin
-          log('Parent: Saving Child origin', this.childOrigin)
+          log('Parent: Received handshake reply from Child');
+          this.parent.removeEventListener('message', reply, false);
+          this.childOrigin = e.origin;
+          log('Parent: Saving Child origin', this.childOrigin);
 
-          return resolve(new ParentAPI(this))
+          return resolve(new ParentAPI(this));
         }
 
         // Might need to remove since parent might be receiving different messages
         // from different hosts
-        log('Parent: Invalid handshake reply')
+        log('Parent: Invalid handshake reply');
 
-        return reject('Failed handshake')
-      }
+        return reject('Failed handshake');
+      };
 
-      this.parent.addEventListener('message', reply, false)
+      this.parent.addEventListener('message', reply, false);
 
       const doSend = () => {
         if (++attempt > maxHandshakeRequests) {
-          clearInterval(responseInterval)
-          return reject('Handshake Timeout Reached')
+          clearInterval(responseInterval);
+          return reject('Handshake Timeout Reached');
         }
 
-        log(`Parent: Sending handshake attempt ${attempt}`, { childOrigin })
+        log(`Parent: Sending handshake attempt ${attempt}`, { childOrigin });
 
         this.child.postMessage({
           postmate: 'handshake',
           type: messageType,
           model: this.model,
-        }, childOrigin)
-      }
+        }, childOrigin);
+      };
 
       const loaded = () => {
-        doSend()
-        responseInterval = setInterval(doSend, 500)
-      }
+        doSend();
+        responseInterval = setInterval(doSend, 500);
+      };
 
       if (this.frame.attachEvent) {
-        this.frame.attachEvent('onload', loaded)
+        this.frame.attachEvent('onload', loaded);
       } else {
-        this.frame.addEventListener('load', loaded)
+        this.frame.addEventListener('load', loaded);
       }
 
-      log('Parent: Loading frame', { url })
+      log('Parent: Loading frame', { url });
 
-      this.frame.src = url
-    })
+      this.frame.src = url;
+    });
   }
 }
 
@@ -344,10 +350,10 @@ Postmate.Model = class Model {
    * @return {Promise}       The Promise that resolves when the handshake has been received
    */
   constructor (model) {
-    this.child = window
-    this.model = model
-    this.parent = this.child.parent
-    return this.sendHandshakeReply()
+    this.child = window;
+    this.model = model;
+    this.parent = this.child.parent;
+    return this.sendHandshakeReply();
   }
 
   /**
@@ -358,40 +364,40 @@ Postmate.Model = class Model {
     return new Postmate.Promise((resolve, reject) => {
       const shake = (e) => {
         if (!e.data.postmate) {
-          return
+          return;
         }
         if (e.data.postmate === 'handshake') {
-          log('Child: Received handshake from Parent')
+          log('Child: Received handshake from Parent');
 
-          this.child.removeEventListener('message', shake, false)
+          this.child.removeEventListener('message', shake, false);
 
-          log('Child: Sending handshake reply to Parent')
+          log('Child: Sending handshake reply to Parent');
 
           e.source.postMessage({
             postmate: 'handshake-reply',
             type: messageType,
-          }, e.origin)
-          this.parentOrigin = e.origin
+          }, e.origin);
+          this.parentOrigin = e.origin;
 
           // Extend model with the one provided by the parent
-          const defaults = e.data.model
+          const defaults = e.data.model;
           if (defaults) {
             Object.keys(defaults).forEach(key => {
-              this.model[key] = defaults[key]
-            })
+              this.model[key] = defaults[key];
+            });
 
-            log('Child: Inherited and extended model from Parent')
+            log('Child: Inherited and extended model from Parent');
           }
 
-          log('Child: Saving Parent origin', this.parentOrigin)
+          log('Child: Saving Parent origin', this.parentOrigin);
 
-          return resolve(new ChildAPI(this))
+          return resolve(new ChildAPI(this));
         }
-        return reject('Handshake Reply Failed')
-      }
-      this.child.addEventListener('message', shake, false)
-    })
+        return reject('Handshake Reply Failed');
+      };
+      this.child.addEventListener('message', shake, false);
+    });
   }
-}
+};
 
-export { Postmate }
+export { Postmate };
