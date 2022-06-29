@@ -1,6 +1,6 @@
 {
   "name": "postmatex",
-  "version": "1.7.5",
+  "version": "1.8.0",
   "description": "Fork of original: A powerful, simple, promise-based postMessage library",
   "scripts": {
     "eslint": "eslint . --fix",
